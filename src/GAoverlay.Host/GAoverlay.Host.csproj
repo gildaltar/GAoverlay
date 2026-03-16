@@ -5,6 +5,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AssemblyName>GAoverlay.Host</AssemblyName>
     <RootNamespace>GAoverlay.Host</RootNamespace>
     <LangVersion>latest</LangVersion>
