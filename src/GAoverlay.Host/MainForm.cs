@@ -20,9 +20,22 @@ public sealed class MainForm : Form
     private readonly NotifyIcon _notifyIcon = new();
     private readonly FlowLayoutPanel _zonePanel = new() { Dock = DockStyle.Fill, AutoScroll = true, WrapContents = true };
     private readonly Panel _reticlePanel = new() { Width = 32, Height = 32, BackColor = Color.Transparent, Visible = false };
-    private readonly ToolTip _toolTips = new();
+    private readonly ToolTip _toolTips = new() { AutomaticDelay = 180, AutoPopDelay = 12000, ReshowDelay = 120 };
+    private readonly Panel _onboardingPanel = new() { Dock = DockStyle.Top, Height = 170, Padding = new Padding(0), Visible = false };
+    private readonly Panel _onboardingAccentBar = new() { Dock = DockStyle.Left, Width = 5 };
+    private readonly Label _onboardingEyebrow = new() { AutoSize = true, Font = new Font("Segoe UI", 9f, FontStyle.Bold) };
+    private readonly Label _onboardingTitle = new() { AutoSize = true, MaximumSize = new Size(760, 0), Font = new Font("Segoe UI Semibold", 16f, FontStyle.Bold) };
+    private readonly Label _onboardingBody = new() { AutoSize = true, MaximumSize = new Size(760, 0), Font = new Font("Segoe UI", 9.5f, FontStyle.Regular) };
+    private readonly FlowLayoutPanel _onboardingActions = new() { AutoSize = true, WrapContents = true, Margin = new Padding(0, 16, 0, 0) };
+    private readonly Button _onboardingPrimaryButton = new() { AutoSize = true };
+    private readonly Button _onboardingSecondaryButton = new() { AutoSize = true };
+    private readonly Button _onboardingTertiaryButton = new() { AutoSize = true };
 
     private bool _clickThroughEnabled;
+    private bool _onboardingDismissedForSession;
+    private Action? _onboardingPrimaryAction;
+    private Action? _onboardingSecondaryAction;
+    private Action? _onboardingTertiaryAction;
 
     public MainForm(ConfigService config, LiveStateService state, PluginLoader plugins, HostBridge host)
     {
@@ -42,13 +55,13 @@ public sealed class MainForm : Form
         var topBar = new FlowLayoutPanel
         {
             Dock = DockStyle.Top,
-            Height = 46,
-            BackColor = Color.FromArgb(72, 0, 0, 0),
+            Height = 54,
+            BackColor = HostUi.ToolbarOverlay,
             Padding = new Padding(6)
         };
 
         AddButton(topBar, "Click-Through", "Make the overlay ignore mouse input so your game keeps focus.", (_, _) => ToggleClickThrough());
-        AddButton(topBar, "Plugins", "Inspect loaded plugin manifests and load status.", (_, _) => new PluginManagerForm(_plugins).ShowDialog(this));
+        AddButton(topBar, "Plugins", "Inspect loaded plugin manifests and load status.", (_, _) => new PluginManagerForm(_plugins, _host.Theme.AccentColor).ShowDialog(this));
         AddButton(topBar, "Launchers", "Run configured launchers and helpers.", (_, _) => ShowLaunchers());
         AddButton(topBar, "Macros", "Run configured macro files.", (_, _) => ShowMacros());
         AddButton(topBar, "Theme", "Pick an accent color for the overlay.", (_, _) => EditTheme());
@@ -58,7 +71,11 @@ public sealed class MainForm : Form
         AddButton(topBar, "Reticle", "Toggle a simple center reticle overlay.", (_, _) => _reticlePanel.Visible = !_reticlePanel.Visible);
         AddButton(topBar, "Hide", "Hide the overlay to the tray icon.", (_, _) => Hide());
 
+        BuildOnboardingPanel();
+        ApplyOnboardingTheme();
+
         Controls.Add(_zonePanel);
+        Controls.Add(_onboardingPanel);
         Controls.Add(topBar);
         Controls.Add(_reticlePanel);
 
@@ -76,10 +93,7 @@ public sealed class MainForm : Form
         {
             CenterReticle();
             RenderZones();
-            if (!_host.InstallOptions.FirstRunCompleted)
-            {
-                ShowSetupWizard();
-            }
+            RefreshOnboardingSurface();
         };
 
         _notifyIcon.Visible = true;
@@ -105,7 +119,11 @@ public sealed class MainForm : Form
         {
             if (IsHandleCreated)
             {
-                BeginInvoke(RenderZones);
+                BeginInvoke(() =>
+                {
+                    RenderZones();
+                    RefreshOnboardingSurface();
+                });
             }
         };
     }
@@ -118,6 +136,7 @@ public sealed class MainForm : Form
             AutoSize = true,
             Margin = new Padding(6)
         };
+        HostUi.StyleButton(button, _host.Theme.AccentColor, primary: false);
         button.Click += click;
         _toolTips.SetToolTip(button, toolTip);
         container.Controls.Add(button);
@@ -150,6 +169,7 @@ public sealed class MainForm : Form
 
         _zonePanel.ResumeLayout();
         _reticlePanel.Invalidate();
+        RefreshOnboardingSurface();
     }
 
     private string ResolveValue(string key)
@@ -159,29 +179,7 @@ public sealed class MainForm : Form
             : "n/a";
     }
 
-    private static Color ParseColor(string hex)
-    {
-        hex = hex.TrimStart('#');
-
-        if (hex.Length == 8)
-        {
-            return Color.FromArgb(
-                Convert.ToInt32(hex[..2], 16),
-                Convert.ToInt32(hex[2..4], 16),
-                Convert.ToInt32(hex[4..6], 16),
-                Convert.ToInt32(hex[6..8], 16));
-        }
-
-        if (hex.Length == 6)
-        {
-            return Color.FromArgb(
-                Convert.ToInt32(hex[..2], 16),
-                Convert.ToInt32(hex[2..4], 16),
-                Convert.ToInt32(hex[4..6], 16));
-        }
-
-        return Color.White;
-    }
+    private static Color ParseColor(string hex) => HostUi.ParseColor(hex, Color.White);
 
     private void ToggleClickThrough()
     {
@@ -271,12 +269,13 @@ public sealed class MainForm : Form
             ReticleColor = _host.Theme.ReticleColor
         });
 
+        ApplyOnboardingTheme();
         RenderZones();
     }
 
     private void ShowCalibration()
     {
-        using var form = new CaptureCalibrationForm(_host.Calibration);
+        using var form = new CaptureCalibrationForm(_host.Calibration, _host.Theme.AccentColor);
         if (form.ShowDialog(this) == DialogResult.OK)
         {
             _host.SaveCalibration(form.Calibration);
@@ -286,7 +285,7 @@ public sealed class MainForm : Form
 
     private void ShowProfiles()
     {
-        using var form = new LayoutProfilesForm(_host.LayoutProfiles);
+        using var form = new LayoutProfilesForm(_host.LayoutProfiles, _host.Theme.AccentColor);
         if (form.ShowDialog(this) != DialogResult.OK)
         {
             return;
@@ -307,13 +306,14 @@ public sealed class MainForm : Form
 
     private void ShowSetupWizard()
     {
-        using var form = new SetupWizardForm(_host.InstallOptions);
+        using var form = new SetupWizardForm(_host.InstallOptions, _host.Theme.AccentColor);
         if (form.ShowDialog(this) != DialogResult.OK)
         {
             return;
         }
 
         _host.SaveInstallOptions(form.Options);
+        _onboardingDismissedForSession = false;
 
         if (form.Options.RegisterSampleMacros)
         {
@@ -330,6 +330,130 @@ public sealed class MainForm : Form
         {
             _host.RegisterLauncher(new LauncherItem { Name = "Epic Games Launcher (Configured)", Path = form.Options.EpicLauncherPath });
         }
+
+        RefreshOnboardingSurface();
+    }
+
+    private void BuildOnboardingPanel()
+    {
+        _onboardingPanel.BackColor = HostUi.Surface;
+
+        var content = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = false,
+            ColumnCount = 1,
+            Padding = new Padding(18, 16, 18, 16)
+        };
+
+        _onboardingEyebrow.Margin = Padding.Empty;
+        _onboardingTitle.Margin = new Padding(0, 6, 0, 0);
+        _onboardingBody.Margin = new Padding(0, 10, 0, 0);
+
+        StyleOnboardingButton(_onboardingPrimaryButton, primary: true);
+        StyleOnboardingButton(_onboardingSecondaryButton, primary: false);
+        StyleOnboardingButton(_onboardingTertiaryButton, primary: false);
+
+        _onboardingPrimaryButton.Click += (_, _) => _onboardingPrimaryAction?.Invoke();
+        _onboardingSecondaryButton.Click += (_, _) => _onboardingSecondaryAction?.Invoke();
+        _onboardingTertiaryButton.Click += (_, _) => _onboardingTertiaryAction?.Invoke();
+
+        _onboardingActions.Controls.Add(_onboardingPrimaryButton);
+        _onboardingActions.Controls.Add(_onboardingSecondaryButton);
+        _onboardingActions.Controls.Add(_onboardingTertiaryButton);
+
+        content.Controls.Add(_onboardingEyebrow);
+        content.Controls.Add(_onboardingTitle);
+        content.Controls.Add(_onboardingBody);
+        content.Controls.Add(_onboardingActions);
+
+        _onboardingPanel.Controls.Add(content);
+        _onboardingPanel.Controls.Add(_onboardingAccentBar);
+    }
+
+    private void StyleOnboardingButton(Button button, bool primary)
+    {
+        HostUi.StyleButton(button, _host.Theme.AccentColor, primary);
+        button.Margin = new Padding(0, 0, 10, 0);
+    }
+
+    private void ApplyOnboardingTheme()
+    {
+        var accent = ParseColor(_host.Theme.AccentColor);
+        _onboardingPanel.BackColor = HostUi.Surface;
+        _onboardingAccentBar.BackColor = accent;
+        _onboardingEyebrow.ForeColor = accent;
+        _onboardingTitle.ForeColor = HostUi.TextPrimary;
+        _onboardingBody.ForeColor = HostUi.TextSecondary;
+        _onboardingPrimaryButton.BackColor = accent;
+    }
+
+    private void RefreshOnboardingSurface()
+    {
+        if (_onboardingDismissedForSession)
+        {
+            _onboardingPanel.Visible = false;
+            return;
+        }
+
+        if (!_host.InstallOptions.FirstRunCompleted)
+        {
+            ConfigureOnboarding(
+                "FIRST RUN",
+                "One quiet overlay. More depth than it first lets on.",
+                "Start with the essentials in about two minutes. GAoverlay stays calm on the surface, then opens into launchers, macros, profiles, and plugin-powered extras when you are ready.",
+                ("Start setup", () => ShowSetupWizard()),
+                ("Open profiles", () => ShowProfiles()),
+                ("Hide for now", () =>
+                {
+                    _onboardingDismissedForSession = true;
+                    RefreshOnboardingSurface();
+                }));
+            return;
+        }
+
+        if (_state.CurrentState.Count == 0)
+        {
+            ConfigureOnboarding(
+                "LIVE FEED WAITING",
+                "The overlay is loaded. It just needs a data source.",
+                "Your layout is ready, and the n/a values will disappear as soon as a plugin publishes state. Inspect Plugins to see what is staged, or revisit Setup if you want faster launch access first.",
+                ("Open plugins", () => new PluginManagerForm(_plugins, _host.Theme.AccentColor).ShowDialog(this)),
+                ("Open setup", () => ShowSetupWizard()),
+                ("Dismiss", () =>
+                {
+                    _onboardingDismissedForSession = true;
+                    RefreshOnboardingSurface();
+                }));
+            return;
+        }
+
+        _onboardingPanel.Visible = false;
+    }
+
+    private void ConfigureOnboarding(
+        string eyebrow,
+        string title,
+        string body,
+        (string Text, Action Handler) primary,
+        (string Text, Action Handler) secondary,
+        (string Text, Action Handler) tertiary)
+    {
+        _onboardingEyebrow.Text = eyebrow;
+        _onboardingTitle.Text = title;
+        _onboardingBody.Text = body;
+        ApplyOnboardingTheme();
+        SetOnboardingAction(_onboardingPrimaryButton, primary.Text, primary.Handler, ref _onboardingPrimaryAction);
+        SetOnboardingAction(_onboardingSecondaryButton, secondary.Text, secondary.Handler, ref _onboardingSecondaryAction);
+        SetOnboardingAction(_onboardingTertiaryButton, tertiary.Text, tertiary.Handler, ref _onboardingTertiaryAction);
+        _onboardingPanel.Visible = true;
+    }
+
+    private static void SetOnboardingAction(Button button, string text, Action handler, ref Action? target)
+    {
+        button.Text = text;
+        button.Visible = true;
+        target = handler;
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
