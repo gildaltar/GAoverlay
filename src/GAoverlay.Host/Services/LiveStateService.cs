@@ -18,8 +18,7 @@ public sealed class LiveStateService
 
         if (!File.Exists(_liveStatePath))
         {
-            File.WriteAllText(_liveStatePath, "{}
-");
+            File.WriteAllText(_liveStatePath, "{}");
         }
 
         _watcher = new FileSystemWatcher(Path.GetDirectoryName(_liveStatePath)!, Path.GetFileName(_liveStatePath))

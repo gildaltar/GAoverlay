@@ -50,10 +50,10 @@ public sealed class MacroItem
 
 public sealed class ThemeSettings
 {
-    public string AccentColor { get; set; } = "#00B7FF";
-    public string HudForeground { get; set; } = "#FFFFFF";
-    public string HudBackground { get; set; } = "#44000000";
-    public string ReticleColor { get; set; } = "#FF4040";
+    public string AccentColor { get; set; } = "#6FB0D8";
+    public string HudForeground { get; set; } = "#E8EEF6";
+    public string HudBackground { get; set; } = "#66121A23";
+    public string ReticleColor { get; set; } = "#FF7B7B";
 }
 
 public sealed class CaptureCalibration
