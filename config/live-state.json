@@ -1,0 +1,9 @@
+{
+  "health": 100,
+  "shield": 50,
+  "ammo": "30 / 180",
+  "loadout": "AR | Shotgun | SMG | Minis | Medkit",
+  "teammates": "Ezra, Ally, Bot42",
+  "match": "Round 2 | 3 Elims | #12",
+  "killFeed": "Ezra knocked Player42"
+}

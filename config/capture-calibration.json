@@ -1,0 +1,11 @@
+{
+  "gameKey": "fortnite",
+  "windowTitleHint": "Fortnite",
+  "captureX": 0,
+  "captureY": 0,
+  "captureWidth": 1920,
+  "captureHeight": 1080,
+  "uiScalePercent": 100,
+  "borderlessWindowExpected": true,
+  "enabled": true
+}

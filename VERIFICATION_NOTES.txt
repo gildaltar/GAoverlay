@@ -1,0 +1,27 @@
+GAoverlay package update notes
+============================
+
+What was changed
+- Added complete source projects for all preinstalled plugins.
+- Added plugin manifest auto-generation for loose compatible DLLs.
+- Added a first-run setup workflow and config model.
+- Added tooltip coverage for main UI controls and zone labels.
+- Added plugin build/staging script.
+- Added file-driven OCR/post-match/stat-sync sample pipelines and seeded sample input folders.
+- Expanded solution to include all plugin projects.
+
+What was verified here
+- Folder structure and project references were checked manually.
+- Manifest names, assembly names, and project names were normalized for GAoverlay.
+- Startup scripts and config file paths were normalized.
+- Runtime folders for captures/data/plugin settings were included.
+
+Important limitation
+- This environment does not have the .NET SDK or Windows desktop runtime, so I could not perform an actual Windows build or run the WinForms host here.
+- That means this package is source-completed and statically sanity-checked, not locally executed end-to-end in this container.
+
+Recommended first Windows-side validation
+1. Install .NET 8 SDK.
+2. Run: dotnet build GAoverlay.sln
+3. Run: .\Build-And-Stage-Plugins.ps1
+4. Run: .\Start-Host.ps1

@@ -1,0 +1,1 @@
+Drop icons, tray images, and optional plugin assets here.

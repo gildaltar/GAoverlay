@@ -1,0 +1,26 @@
+{
+  "id": "gaoverlay.theme.tools",
+  "name": "Theme Tools",
+  "author": "OpenAI",
+  "version": "1.1.0",
+  "mainAssembly": "GAoverlay.ThemeTools.dll",
+  "entryType": "GAoverlay.ThemeTools.ThemeToolsPlugin",
+  "iconPath": "icon.png",
+  "description": "Theme and color controls for overlay elements.",
+  "category": "Theme",
+  "supportedGames": [
+    "fortnite",
+    "valorant",
+    "apex"
+  ],
+  "prerequisites": [],
+  "permissions": [
+    "theme.write"
+  ],
+  "tags": [
+    "theme",
+    "color"
+  ],
+  "settingsFile": "gaoverlay.theme-tools.settings.json",
+  "enabledByDefault": true
+}

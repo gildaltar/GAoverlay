@@ -1,0 +1,13 @@
+{
+  "firstRunCompleted": false,
+  "preferredInstallDirectory": "",
+  "gamesDirectory": "",
+  "iconsDirectory": "",
+  "fortniteExecutablePath": "",
+  "epicLauncherPath": "",
+  "steelSeriesPath": "",
+  "createDesktopShortcut": true,
+  "createStartMenuShortcut": true,
+  "registerSampleMacros": true,
+  "enablePreinstalledPlugins": true
+}

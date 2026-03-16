@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Sample AHK Macro",
+    "path": "samples\\sample_macro.ahk",
+    "arguments": "",
+    "enabled": true
+  },
+  {
+    "name": "Sample PowerShell Macro",
+    "path": "samples\\sample_macro.ps1",
+    "arguments": "",
+    "enabled": true
+  }
+]

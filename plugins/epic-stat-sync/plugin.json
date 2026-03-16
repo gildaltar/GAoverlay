@@ -1,0 +1,27 @@
+{
+  "id": "gaoverlay.epic.stats.sync",
+  "name": "Epic Stat Sync Plugin",
+  "author": "OpenAI",
+  "version": "1.0.0",
+  "mainAssembly": "GAoverlay.Plugin.EpicStatsSync.dll",
+  "entryType": "GAoverlay.Plugin.EpicStatsSync.EpicStatsSyncPlugin",
+  "iconPath": "icon.png",
+  "description": "Epic stat sync scaffold using approved or public user-authorized flows.",
+  "category": "Stats",
+  "supportedGames": [
+    "fortnite"
+  ],
+  "prerequisites": [],
+  "permissions": [
+    "files.read",
+    "files.write",
+    "hud.register"
+  ],
+  "tags": [
+    "epic",
+    "stats",
+    "sync"
+  ],
+  "settingsFile": "gaoverlay.epic-stat-sync.settings.json",
+  "enabledByDefault": true
+}

@@ -1,0 +1,25 @@
+{
+  "id": "gaoverlay.post.match.parser",
+  "name": "Post-Match Parser Plugin",
+  "author": "OpenAI",
+  "version": "1.0.0",
+  "mainAssembly": "GAoverlay.Plugin.PostMatchParser.dll",
+  "entryType": "GAoverlay.Plugin.PostMatchParser.PostMatchParserPlugin",
+  "iconPath": "icon.png",
+  "description": "Parses post-match data into normalized summaries.",
+  "category": "Analysis",
+  "supportedGames": [
+    "fortnite"
+  ],
+  "prerequisites": [],
+  "permissions": [
+    "files.read",
+    "files.write"
+  ],
+  "tags": [
+    "post-match",
+    "parser"
+  ],
+  "settingsFile": "gaoverlay.post-match-parser.settings.json",
+  "enabledByDefault": true
+}

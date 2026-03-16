@@ -1,0 +1,23 @@
+{
+  "id": "example.plugin",
+  "name": "Example Plugin",
+  "author": "OpenAI",
+  "version": "1.1.0",
+  "mainAssembly": "ExamplePlugin.dll",
+  "entryType": "ExamplePlugin.ExamplePlugin",
+  "iconPath": "icon.png",
+  "description": "Minimal example plugin for GAoverlay.",
+  "category": "Examples",
+  "supportedGames": [
+    "fortnite"
+  ],
+  "prerequisites": [],
+  "permissions": [
+    "hud.register"
+  ],
+  "tags": [
+    "example"
+  ],
+  "settingsFile": "example.plugin.settings.json",
+  "enabledByDefault": false
+}

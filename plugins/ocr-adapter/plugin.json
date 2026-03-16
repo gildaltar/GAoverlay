@@ -1,0 +1,30 @@
+{
+  "id": "gaoverlay.ocr.adapter",
+  "name": "OCR Adapter Plugin",
+  "author": "OpenAI",
+  "version": "1.0.0",
+  "mainAssembly": "GAoverlay.Plugin.OcrAdapter.dll",
+  "entryType": "GAoverlay.Plugin.OcrAdapter.OcrAdapterPlugin",
+  "iconPath": "icon.png",
+  "description": "OCR adapter scaffold for health, shield, ammo, and kill feed capture.",
+  "category": "Capture",
+  "supportedGames": [
+    "fortnite",
+    "valorant",
+    "apex"
+  ],
+  "prerequisites": [
+    "capture.calibration"
+  ],
+  "permissions": [
+    "files.read",
+    "files.write",
+    "hud.register"
+  ],
+  "tags": [
+    "ocr",
+    "capture"
+  ],
+  "settingsFile": "gaoverlay.ocr-adapter.settings.json",
+  "enabledByDefault": true
+}

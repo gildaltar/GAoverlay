@@ -1,0 +1,27 @@
+{
+  "id": "gaoverlay.audio.tools",
+  "name": "Audio Tools",
+  "author": "OpenAI",
+  "version": "1.1.0",
+  "mainAssembly": "GAoverlay.AudioTools.dll",
+  "entryType": "GAoverlay.AudioTools.AudioToolsPlugin",
+  "iconPath": "icon.png",
+  "description": "Audio controls and helper actions for overlay workflows.",
+  "category": "Audio",
+  "supportedGames": [
+    "fortnite",
+    "valorant",
+    "apex"
+  ],
+  "prerequisites": [],
+  "permissions": [
+    "app.macro.register",
+    "overlay.draw"
+  ],
+  "tags": [
+    "audio",
+    "utility"
+  ],
+  "settingsFile": "gaoverlay.audio-tools.settings.json",
+  "enabledByDefault": true
+}

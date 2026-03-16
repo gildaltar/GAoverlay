@@ -1,0 +1,26 @@
+{
+  "id": "gaoverlay.extra.hud.zones",
+  "name": "Extra HUD Zones",
+  "author": "OpenAI",
+  "version": "1.1.0",
+  "mainAssembly": "GAoverlay.ExtraHudZones.dll",
+  "entryType": "GAoverlay.ExtraHudZones.ExtraHudZonesPlugin",
+  "iconPath": "icon.png",
+  "description": "Registers additional HUD containers for custom game layouts.",
+  "category": "Layout",
+  "supportedGames": [
+    "fortnite",
+    "valorant",
+    "apex"
+  ],
+  "prerequisites": [],
+  "permissions": [
+    "hud.register"
+  ],
+  "tags": [
+    "zones",
+    "layout"
+  ],
+  "settingsFile": "gaoverlay.extra-hud-zones.settings.json",
+  "enabledByDefault": true
+}
