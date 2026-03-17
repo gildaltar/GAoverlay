@@ -4,3 +4,12 @@
 
 # Archives
 *.zip
+
+# ext
+.vs/
+*.dll
+bin/
+obj/
+*.user
+*.suo
+*.cache
